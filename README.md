@@ -27,3 +27,8 @@ Matching stats
 Skill trends
 
 Resume quality insights
+
+
+Daily Log:
+
+12/8 - installed maven, downloaded project from spring initlizer with all dependencies, added h2 db connection, mvn clean and to run - mvn spring-boot:run
