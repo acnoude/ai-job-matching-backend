@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.anu.aijobmatching.user.dto.UserLoginRequest;
+import com.anu.aijobmatching.user.dto.UserLoginResponse;
 import com.anu.aijobmatching.user.dto.UserRegisterRequest;
 import com.anu.aijobmatching.user.dto.UserRegisterResponse;
 
@@ -24,5 +26,10 @@ public class UserController {
     public ResponseEntity<UserRegisterResponse> register(@Valid @RequestBody UserRegisterRequest request) {
         UserRegisterResponse response = userService.register(request);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserLoginResponse> login(@Valid @RequestBody UserLoginRequest request) {
+        return ResponseEntity.ok(userService.login(request));
     }
 }

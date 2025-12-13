@@ -5,8 +5,12 @@ import java.time.LocalDateTime;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.anu.aijobmatching.user.dto.UserLoginRequest;
+import com.anu.aijobmatching.user.dto.UserLoginResponse;
 import com.anu.aijobmatching.user.dto.UserRegisterRequest;
 import com.anu.aijobmatching.user.dto.UserRegisterResponse;
+import com.anu.aijobmatching.user.exception.InvalidCredentialsException;
+import com.anu.aijobmatching.user.exception.UserNotFoundException;
 
 @Service
 public class UserService {
@@ -30,4 +34,19 @@ public class UserService {
 
         return new UserRegisterResponse(saved.getId(), saved.getName(), saved.getEmail());
     }
+
+    public UserLoginResponse login(UserLoginRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new UserNotFoundException("user not found:" + request.email()));
+        boolean ok = passwordEncoder.matches(request.password(), user.getPasswordHash());
+
+        if (!ok) {
+            throw new InvalidCredentialsException("Invalid email or password");
+        }
+
+        String token = "TOKEN_PLACEHOLDER";
+
+        return new UserLoginResponse(user.getId(), user.getName(), user.getEmail(), token);
+    }
+
 }

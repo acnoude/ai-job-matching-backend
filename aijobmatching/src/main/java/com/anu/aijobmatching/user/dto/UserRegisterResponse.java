@@ -1,7 +1,7 @@
 package com.anu.aijobmatching.user.dto;
 
 public record UserRegisterResponse(
-        Long id,
-        String name,
-        String email) {
+                Long id,
+                String name,
+                String email) {
 }
