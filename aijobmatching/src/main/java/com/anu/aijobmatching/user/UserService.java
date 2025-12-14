@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.anu.aijobmatching.security.JwtService;
 import com.anu.aijobmatching.user.dto.UserLoginRequest;
 import com.anu.aijobmatching.user.dto.UserLoginResponse;
 import com.anu.aijobmatching.user.dto.UserRegisterRequest;
@@ -16,10 +17,12 @@ import com.anu.aijobmatching.user.exception.UserNotFoundException;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public UserRegisterResponse register(UserRegisterRequest request) {
@@ -44,7 +47,7 @@ public class UserService {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
-        String token = "TOKEN_PLACEHOLDER";
+        String token = jwtService.generateToken(request.email());
 
         return new UserLoginResponse(user.getId(), user.getName(), user.getEmail(), token);
     }
