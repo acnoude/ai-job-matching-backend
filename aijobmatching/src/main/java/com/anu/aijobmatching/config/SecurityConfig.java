@@ -10,13 +10,18 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.anu.aijobmatching.security.JwtAuthenticationFilter;
+import com.anu.aijobmatching.security.RestAuthenticationEntryPoint;
 
 @Configuration
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    private final RestAuthenticationEntryPoint authenticationEntryPoint;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+            RestAuthenticationEntryPoint restAuthenticationEntryPoint) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.authenticationEntryPoint = restAuthenticationEntryPoint;
     }
 
     @Bean
@@ -30,8 +35,22 @@ public class SecurityConfig {
 
         // return http.build();
 
+        // http.csrf(csrf -> csrf.disable())
+        // .sessionManagement(sm ->
+        // sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        // .authorizeHttpRequests(auth -> auth.requestMatchers("/api/users/register",
+        // "/api/users/login",
+        // "/h2-console/**").permitAll().anyRequest().authenticated())
+        // .addFilterBefore(jwtAuthenticationFilter,
+        // UsernamePasswordAuthenticationFilter.class);
+
+        // http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
+
+        // return http.build();
+
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(eh -> eh.authenticationEntryPoint(authenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/api/users/register",
                         "/api/users/login", "/h2-console/**").permitAll().anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

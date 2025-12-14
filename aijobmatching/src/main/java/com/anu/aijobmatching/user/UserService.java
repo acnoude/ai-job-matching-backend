@@ -2,16 +2,20 @@ package com.anu.aijobmatching.user;
 
 import java.time.LocalDateTime;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.anu.aijobmatching.security.JwtService;
 import com.anu.aijobmatching.user.dto.UserLoginRequest;
 import com.anu.aijobmatching.user.dto.UserLoginResponse;
+import com.anu.aijobmatching.user.dto.UserMeResponse;
 import com.anu.aijobmatching.user.dto.UserRegisterRequest;
 import com.anu.aijobmatching.user.dto.UserRegisterResponse;
 import com.anu.aijobmatching.user.exception.InvalidCredentialsException;
 import com.anu.aijobmatching.user.exception.UserNotFoundException;
+
+import jakarta.validation.Valid;
 
 @Service
 public class UserService {
@@ -50,6 +54,12 @@ public class UserService {
         String token = jwtService.generateToken(request.email());
 
         return new UserLoginResponse(user.getId(), user.getName(), user.getEmail(), token);
+    }
+
+    public UserMeResponse whoami(String request) {
+        User user = userRepository.findByEmail(request)
+                .orElseThrow(() -> new UserNotFoundException("no iser with email:" + request));
+        return new UserMeResponse(user.getId(), user.getName(), user.getEmail());
     }
 
 }
