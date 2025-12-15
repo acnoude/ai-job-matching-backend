@@ -45,15 +45,19 @@ public class UserService {
     public UserLoginResponse login(UserLoginRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new UserNotFoundException("user not found:" + request.email()));
-        boolean ok = passwordEncoder.matches(request.password(), user.getPasswordHash());
 
-        if (!ok) {
+        if (!validatePassword(request, user)) {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
         String token = jwtService.generateToken(request.email());
 
-        return new UserLoginResponse(user.getId(), user.getName(), user.getEmail(), token);
+        return new UserLoginResponse(token, "Bearer");
+    }
+
+    private boolean validatePassword(UserLoginRequest request, User user) {
+        boolean ok = passwordEncoder.matches(request.password(), user.getPasswordHash());
+        return ok;
     }
 
     public UserMeResponse whoami(String request) {
