@@ -35,7 +35,8 @@ public class UserService {
         }
 
         User user = User.builder().name(request.name()).email(request.email())
-                .passwordHash(passwordEncoder.encode(request.password())).createdAt(LocalDateTime.now()).build();
+                .passwordHash(passwordEncoder.encode(request.password())).createdAt(LocalDateTime.now()).role(Role.USER)
+                .build();
 
         User saved = userRepository.save(user);
 

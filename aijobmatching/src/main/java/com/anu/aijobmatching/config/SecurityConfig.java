@@ -13,6 +13,7 @@ import com.anu.aijobmatching.security.JwtAuthenticationFilter;
 import com.anu.aijobmatching.security.RestAuthenticationEntryPoint;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -48,15 +49,31 @@ public class SecurityConfig {
 
         // return http.build();
 
-        http.csrf(csrf -> csrf.disable())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(eh -> eh.authenticationEntryPoint(authenticationEntryPoint))
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/api/users/register",
-                        "/api/users/login", "/h2-console/**", "/api/health").permitAll().anyRequest().authenticated())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        // http.csrf(csrf -> csrf.disable())
+        //         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        //         .exceptionHandling(eh -> eh.authenticationEntryPoint(authenticationEntryPoint))
+        //         .authorizeHttpRequests(auth -> auth
+        //                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+        //                 .requestMatchers("/api/users/login", "/h2-console/**", "/api/health").hasRole("USER", "ADMIN")
+        //                 .anyRequest().authenticated())
+        //         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
+
+        http.csrf(csrf -> csrf.disable()).sessionManagement(sm-> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .exceptionHandling(eh-> eh.authenticationEntryPoint(authenticationEntryPoint)
+        .accessDeniedHandler((req,res, ex) ->{
+            res.setStatus(403);
+            res.setContentType("application/json");
+            res.getWriter().write("{\"error\":\"FORBIDDEN\",\"message\":\"Access denied\"}");
+        })
+        )
+        .authorizeHttpRequests(auth -> auth.requestMatchers("/api/users/register", "/api/users/login", "/api/health", "/h2-console/**").permitAll()
+        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+        .anyRequest().authenticated()
+        ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
-
         return http.build();
     }
 

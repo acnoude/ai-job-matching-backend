@@ -44,4 +44,28 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
     }
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<?> handleAuth(AuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+            Map.of(
+                "timestamp", Instant.now(),
+                "status", 401,
+                "error", "UNAUTHORIZED",
+                "message", ex.getMessage()
+            )
+        );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+            Map.of(
+                "timestamp", Instant.now(),
+                "status", 403,
+                "error", "FORBIDDEN",
+                "message", "You are not allowed to access this resource"
+            )
+        );
+    }
+
 }
