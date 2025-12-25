@@ -1,17 +1,27 @@
-package com.anu.aijobmatching.common;
+package com.anu.aijobmatching.common.exception;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.time.Instant;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.anu.aijobmatching.user.exception.InvalidCredentialsException;
 import com.anu.aijobmatching.user.exception.UserAlreadyExistsException;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import com.anu.aijobmatching.user.exception.AuthenticationException;
+import com.anu.aijobmatching.common.api.ApiError;
+import com.anu.aijobmatching.user.exception.AccessDeniedException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -24,11 +34,24 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidation(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-    }
+    public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest req) {
+            Map<String, String> fieldErrors = new LinkedHashMap<>();
+            for (FieldError fe : ex.getBindingResult().getFieldErrors()) {
+                fieldErrors.put(fe.getField(), fe.getDefaultMessage());
+            }
+            String traceId = UUID.randomUUID().toString();
+
+            ApiError body = ApiError.of(
+                  "VALIDATION_ERROR",
+                  req.getRequestURI(),
+                  traceId,
+                    fieldErrors,
+                    "Request validation failed",
+                    HttpStatus.BAD_REQUEST.value()
+                    
+            );
+            return ResponseEntity.badRequest().body(body);
+        }
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleNotFound(UsernameNotFoundException ex) {

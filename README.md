@@ -41,3 +41,31 @@ Daily Log:
 ✔️ Password hashing
 ✔️ Persisting user in H2
 ✔️ Testing registration end-to-end
+
+
+Week 1-2-3 :
+
+Architecture
+
+Spring Boot
+
+JWT auth
+
+Layered architecture
+
+Auth Flow
+
+Register
+
+Login → JWT
+
+JWT → Authorization header
+
+APIs
+POST   /api/users/register
+POST   /api/users/login
+GET    /api/users/me
+POST   /api/jobs
+POST   /api/resumes/upload
+PUT    /api/resumes/{id}/keywords
+GET    /api/match/resume/{id}

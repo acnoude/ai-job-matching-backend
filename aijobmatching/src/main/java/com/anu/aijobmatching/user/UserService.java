@@ -30,7 +30,7 @@ public class UserService {
     }
 
     public UserRegisterResponse register(UserRegisterRequest request) {
-        if (userRepository.existsByEmail(request.email())) {
+        if (userRepository.existsByEmailIgnoreCase(request.email())) {
             throw new IllegalArgumentException("Email already registered");
         }
 
@@ -44,7 +44,7 @@ public class UserService {
     }
 
     public UserLoginResponse login(UserLoginRequest request) {
-        User user = userRepository.findByEmail(request.email())
+        User user = userRepository.findByEmailIgnoreCase(request.email())
                 .orElseThrow(() -> new UserNotFoundException("user not found:" + request.email()));
 
         if (!validatePassword(request, user)) {
@@ -62,7 +62,7 @@ public class UserService {
     }
 
     public UserMeResponse whoami(String request) {
-        User user = userRepository.findByEmail(request)
+        User user = userRepository.findByEmailIgnoreCase(request)
                 .orElseThrow(() -> new UserNotFoundException("no iser with email:" + request));
         return new UserMeResponse(user.getId(), user.getName(), user.getEmail());
     }

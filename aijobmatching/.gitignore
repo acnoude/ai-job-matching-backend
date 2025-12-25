@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# local runtime files
+/target/
+/uploads/
+/*.log
+
+# secrets / local overrides
+.env
+application-local.properties
+application-dev.properties

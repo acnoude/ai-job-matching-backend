@@ -2,6 +2,7 @@ package com.anu.aijobmatching.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -68,8 +69,8 @@ public class SecurityConfig {
             res.getWriter().write("{\"error\":\"FORBIDDEN\",\"message\":\"Access denied\"}");
         })
         )
-        .authorizeHttpRequests(auth -> auth.requestMatchers("/api/users/register", "/api/users/login", "/api/health", "/h2-console/**").permitAll()
-        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+        .authorizeHttpRequests(auth -> auth.requestMatchers("/api/users/register", "/api/users/login", "/api/health", "/h2-console/**", "/api/resume/**").permitAll()
+        .requestMatchers("/api/admin/**").hasAllRoles("ADMIN", "USER")
         .anyRequest().authenticated()
         ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
