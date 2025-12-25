@@ -37,7 +37,3 @@ build/
 /uploads/
 /*.log
 
-# secrets / local overrides
-.env
-application-local.properties
-application-dev.properties
